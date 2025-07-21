@@ -1,0 +1,6 @@
+streamlit
+openai
+pinecone-client
+google-cloud-storage
+pdfplumber
+python-docx

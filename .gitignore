@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+
+# IDE / editor
+.vscode/
+.idea/
+
+# File di sistema
+.DS_Store
+Thumbs.db
+
+# Log o output locali
+*.log
+*.csv
