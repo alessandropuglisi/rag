@@ -1,6 +1,6 @@
 streamlit
 openai
-pinecone-client
+pinecone
 google-cloud-storage
 pdfplumber
 python-docx
