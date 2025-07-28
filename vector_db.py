@@ -19,7 +19,7 @@ GCS_BUCKET_NAME = st.secrets["GCS_BUCKET_NAME"]
 service_account_info = st.secrets["GCP_SERVICE_ACCOUNT"]
 
 # Salva temporaneamente il file di credenziali
-with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp:
+with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode="w") as tmp:
     json.dump(service_account_info, tmp)
     tmp.flush()
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = tmp.name
