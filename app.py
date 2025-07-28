@@ -1,20 +1,25 @@
 import streamlit as st
-import os
-
-# Importa la funzione di risposta
 from rag_chatbot import generate_chatgpt_response
 
-# Streamlit UI
-st.set_page_config(page_title="Chat con i tuoi documenti", layout="centered")
-st.title("🗂️ Assistente AI sui tuoi documenti")
+# Configura l'interfaccia web
+st.set_page_config(page_title="RAG Chatbot", layout="wide")
 
-query = st.text_input("Fai una domanda sui documenti indicizzati:")
+# Titolo e descrizione
+st.title("📚 Chatbot RAG - Ricerca nei Documenti")
+st.write("🔍 Digita una domanda e ottieni una risposta basata sui documenti caricati.")
 
-if st.button("Invia") and query.strip():
-    with st.spinner("Sto cercando tra i documenti..."):
-        try:
+# Input dell'utente con text_area
+query = st.text_area("📝 Inserisci una domanda:", height=100)
+
+# Separatore visivo
+st.markdown("---")
+
+# Bottone per inviare la richiesta
+if st.button("Cerca nei documenti"):
+    if query.strip():  # controlla che non sia solo whitespace
+        with st.spinner("🔄 Sto cercando nei documenti..."):
             response = generate_chatgpt_response(query)
-            st.success("Risposta:")
-            st.write(response)
-        except Exception as e:
-            st.error(f"Errore: {e}")
+        st.success("✅ Risposta generata!")
+        st.write(f"🤖 **Risposta:** {response}")
+    else:
+        st.warning("⚠️ Inserisci una domanda prima di cercare.")
