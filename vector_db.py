@@ -16,7 +16,7 @@ PINECONE_INDEX_NAME = st.secrets["PINECONE_INDEX_NAME"]
 GCS_BUCKET_NAME = st.secrets["GCS_BUCKET_NAME"]
 
 # Carica credenziali GCS dai secrets Streamlit
-service_account_info = json.loads(st.secrets["GCP_SERVICE_ACCOUNT"])
+service_account_info = st.secrets["GCP_SERVICE_ACCOUNT"]
 
 # Salva temporaneamente il file di credenziali
 with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp:
