@@ -23,7 +23,7 @@ def embed_text(text):
     return response.data[0].embedding
 
 # Ricerca dei testi rilevanti
-def retrieve_relevant_chunks(query, top_k=5):
+def retrieve_relevant_chunks(query, top_k=10):
     query_embedding = embed_text(query)
     results = index.query(vector=query_embedding, top_k=top_k, include_metadata=True)
     return [match["metadata"]["text"] for match in results["matches"]]
