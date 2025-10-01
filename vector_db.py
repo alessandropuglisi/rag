@@ -1,12 +1,10 @@
 import pdfplumber
 import docx
-import os
 import streamlit as st
-import json
-import tempfile
 from google.cloud import storage
 from openai import OpenAI
 from pinecone import Pinecone
+from google.oauth2 import service_account
 
 # Prendi le chiavi da Streamlit secrets
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -16,13 +14,9 @@ PINECONE_INDEX_NAME = st.secrets["PINECONE_INDEX_NAME"]
 GCS_BUCKET_NAME = st.secrets["GCS_BUCKET_NAME"]
 
 # Carica credenziali GCS dai secrets Streamlit
-service_account_info = st.secrets["GCP_SERVICE_ACCOUNT"]
-
-# Salva temporaneamente il file di credenziali
-with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json", encoding="utf-8") as tmp:
-    json.dump(dict(service_account_info), tmp)
-    tmp.flush()
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = tmp.name
+service_account_info = dict(st.secrets["GCP_SERVICE_ACCOUNT"])
+GCS_CREDENTIALS = service_account.Credentials.from_service_account_info(service_account_info)
+GCS_PROJECT_ID = service_account_info.get("project_id")
 
 # Inizializza i client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -48,8 +42,6 @@ def embed_text(text):
 
 # Indicizzazione
 def add_document_to_index(doc_id, text):
-    from uuid import uuid4
-
     max_chunk_tokens = 700
     words = text.split()
     chunks = [' '.join(words[i:i+max_chunk_tokens]) for i in range(0, len(words), max_chunk_tokens)]
@@ -57,11 +49,11 @@ def add_document_to_index(doc_id, text):
     for i, chunk in enumerate(chunks):
         embedding = embed_text(chunk)
         segment_id = f"{doc_id}_{i}".encode("ascii", errors="ignore").decode()  # Safe ID
-        index.upsert(vectors=[(segment_id, embedding, {"text": chunk[:1000]})])  # limit metadata
+        index.upsert(vectors=[(segment_id, embedding, {"text": chunk})])
 
 # Scarica e indicizza documenti da GCS
 def load_and_index_documents():
-    storage_client = storage.Client()
+    storage_client = storage.Client(credentials=GCS_CREDENTIALS, project=GCS_PROJECT_ID)
     bucket = storage_client.bucket(GCS_BUCKET_NAME)
     blobs = bucket.list_blobs()
 
